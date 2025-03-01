@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #fbffbf;
+        }
+        canvas {
+            border: 2px solid rgb(255, 177, 93);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const gridSize = 20;
+        let snake = [{ x: 200, y: 200 }];
+        let direction = "RIGHT";
+        let food = getRandomFoodPosition();
+        let gameInterval = setInterval(updateGame, 150);
+
+        document.addEventListener("keydown", (e) => {
+            const keyMap = {
+                ArrowUp: "UP",
+                ArrowDown: "DOWN",
+                ArrowLeft: "LEFT",
+                ArrowRight: "RIGHT"
+            };
+            if (keyMap[e.key] && !isOppositeDirection(keyMap[e.key])) {
+                direction = keyMap[e.key];
+            }
+        });
+
+        function updateGame() {
+            const head = { ...snake[0] };
+
+            switch (direction) {
+                case "UP": head.y -= gridSize; break;
+                case "DOWN": head.y += gridSize; break;
+                case "LEFT": head.x -= gridSize; break;
+                case "RIGHT": head.x += gridSize; break;
+            }
+
+            if (head.x === food.x && head.y === food.y) {
+                food = getRandomFoodPosition();
+            } else {
+                snake.pop();
+            }
+
+            if (isCollision(head)) {
+                clearInterval(gameInterval);
+                
+                if (confirm(`Score: ${Object.keys(snake).length}\nGame Over!\nWould you like to play again?`)) window.location.reload();
+                return;
+            }
+
+            snake.unshift(head);
+            drawGame();
+        }
+
+        function drawGame() {
+            ctx.fillStyle = "rgb(161, 243, 255)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "green";
+            ctx.fillRect(food.x, food.y, gridSize, gridSize);
+
+            ctx.fillStyle = "purple";
+            snake.forEach(segment => ctx.fillRect(segment.x, segment.y, gridSize, gridSize));
+        }
+
+        function getRandomFoodPosition() {
+            return {
+                x: Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize,
+                y: Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize
+            };
+        }
+
+        function isCollision(head) {
+            return head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || snake.some(seg => seg.x === head.x && seg.y === head.y);
+        }
+
+        function isOppositeDirection(newDirection) {
+            return (direction === "UP" && newDirection === "DOWN") ||
+                   (direction === "DOWN" && newDirection === "UP") ||
+                   (direction === "LEFT" && newDirection === "RIGHT") ||
+                   (direction === "RIGHT" && newDirection === "LEFT");
+        }
+    </script>
+</body>
+</html>
