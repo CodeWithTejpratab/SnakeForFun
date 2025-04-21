@@ -9,4 +9,4 @@ I got bored and made this. Have fun playing!
 
 That's it! Enjoy!
 
-Play it here: https://codewithtejpratab.github.io/SnakeForFun/
+Play it here: [Snake](https://codewithtejpratab.github.io/SnakeForFun/)
